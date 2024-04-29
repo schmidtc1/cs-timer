@@ -4,30 +4,48 @@ using System.Diagnostics;
 using System.ComponentModel;
 
 namespace Reminder {
+    public class Alarm {
+        public Stopwatch stopwatch;
+        public System.Timers.Timer timer;
+        
+        public Alarm() {
+            timer = new System.Timers.Timer();
+            stopwatch = new Stopwatch();
+        }
+    }
     class Reminder {
         static void Main(string[] args)
         {
-            System.Timers.Timer timer = new System.Timers.Timer(2000);
-            Stopwatch stopwatch = new Stopwatch();
+            Console.CursorVisible = false;
+            Alarm alarm = new Alarm();
 
             const int minutes = 6;
             const int secondsInMinutes = 60;
             const int msInSeconds = 1000;
 
-            timer.Elapsed += OnTimedEvent;
-            timer.Interval = minutes * secondsInMinutes * msInSeconds;
-            timer.AutoReset = true;
-            timer.Enabled = true;
-            stopwatch.Start();
+            alarm.timer.Elapsed += (sender, e) => OnTimedEvent(sender, e, alarm);
+            alarm.timer.Interval = minutes * secondsInMinutes * msInSeconds;
+            alarm.timer.AutoReset = true;
+            alarm.timer.Enabled = true;
+            alarm.stopwatch.Start();
+            
 
             
 
             Console.WriteLine("Press \'q\' to quit the timer.");
-            while (Console.Read() != 'q');
+            do {
+                while (!Console.KeyAvailable) {
+                    var currTime = alarm.stopwatch.Elapsed;
+                    string display = string.Format("{0:00}:{1:00}", currTime.Minutes, currTime.Seconds);
+                    Console.Write("\r{0}", display);
+                    Thread.Sleep(100);
+                }
+            } while (Console.ReadKey(true).Key != ConsoleKey.Q);
             
         }
-        private static void OnTimedEvent(object? source, ElapsedEventArgs e) {
-            Console.WriteLine("Hello World!");
+        private static void OnTimedEvent(object? source, ElapsedEventArgs e, Alarm alarm) {
+            Console.WriteLine("\nStand up, walk, stretch!");
+            alarm.stopwatch.Restart();
             #pragma warning disable CA1416 // Validate platform compatibility
             SoundPlayer player = new SoundPlayer("beep-07a.wav");
             player.Play();
