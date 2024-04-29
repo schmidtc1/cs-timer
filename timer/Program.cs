@@ -1,6 +1,7 @@
 ﻿using System.Timers;
 using System.Media;
 using System.Diagnostics;
+using System.Windows.Forms;
 using System.ComponentModel;
 
 namespace Reminder {
@@ -44,12 +45,16 @@ namespace Reminder {
             
         }
         private static void OnTimedEvent(object? source, ElapsedEventArgs e, Alarm alarm) {
-            Console.WriteLine("\nStand up, walk, stretch!");
-            alarm.stopwatch.Restart();
             #pragma warning disable CA1416 // Validate platform compatibility
             SoundPlayer player = new SoundPlayer("beep-07a.wav");
             player.Play();
+            alarm.stopwatch.Stop();
+            alarm.timer.Stop();
             #pragma warning restore CA1416 // Validate platform compatibility
+            MessageBoxButtons buttons = MessageBoxButtons.OK;
+            MessageBox.Show("\nStand up, walk, stretch!", "Time to move!", buttons);
+            alarm.stopwatch.Restart();
+            alarm.timer.Start();
         }
     }
 }
