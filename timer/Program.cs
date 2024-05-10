@@ -20,28 +20,41 @@ namespace Reminder {
             Console.CursorVisible = false;
             Alarm alarm = new Alarm();
 
-            const int minutes = 6;
+            //const int minutes = 10;
             const int secondsInMinutes = 60;
             const int msInSeconds = 1000;
-
-            alarm.timer.Elapsed += (sender, e) => OnTimedEvent(sender, e, alarm);
-            alarm.timer.Interval = minutes * secondsInMinutes * msInSeconds;
-            alarm.timer.AutoReset = true;
-            alarm.timer.Enabled = true;
-            alarm.stopwatch.Start();
-            
+            int minutes = 10;
 
             
 
-            Console.WriteLine("Press \'q\' to quit the timer.");
-            do {
-                while (!Console.KeyAvailable) {
-                    var currTime = alarm.stopwatch.Elapsed;
-                    string display = string.Format("{0:00}:{1:00}", currTime.Minutes, currTime.Seconds);
-                    Console.Write("\r{0}", display);
-                    Thread.Sleep(100);
+            Console.WriteLine("Input a time for the timer: ");
+            string? input = Console.ReadLine();
+            if (input != null) {
+                if (input.Any(x => char.IsLetter(x))) {
+                    Console.WriteLine("Error: Input must be a number");
                 }
-            } while (Console.ReadKey(true).Key != ConsoleKey.Q);
+                else {
+                    minutes = Int32.Parse(input);
+                    alarm.timer.Elapsed += (sender, e) => OnTimedEvent(sender, e, alarm);
+                    alarm.timer.Interval = minutes * secondsInMinutes * msInSeconds;
+                    alarm.timer.AutoReset = true;
+                    alarm.timer.Enabled = true;
+                    alarm.stopwatch.Start();
+                    
+                    
+                    Console.WriteLine("Press \'q\' to quit the timer.");
+                    do {
+                        while (!Console.KeyAvailable) {
+                            var currTime = alarm.stopwatch.Elapsed;
+                            string display = string.Format("{0:00}:{1:00}", currTime.Minutes, currTime.Seconds);
+                            Console.Write("\r{0}", display);
+                            Thread.Sleep(100);
+                        }
+                    } while (Console.ReadKey(true).Key != ConsoleKey.Q);
+                } 
+
+            }
+
             
         }
         private static void OnTimedEvent(object? source, ElapsedEventArgs e, Alarm alarm) {
